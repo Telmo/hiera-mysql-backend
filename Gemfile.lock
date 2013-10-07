@@ -1,0 +1,18 @@
+PATH
+  remote: .
+  specs:
+    hiera-mysql-backend (0.0.1)
+      mysql2
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    mysql2 (0.3.13)
+    rake (10.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  hiera-mysql-backend!
+  rake
