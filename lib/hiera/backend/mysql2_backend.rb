@@ -1,6 +1,6 @@
 class Hiera
   module Backend
-    class Mysql_backend
+    class Mysql2_backend
 
       def initialize(cache=nil)
         begin
@@ -12,7 +12,7 @@ class Hiera
 
         @cache = cache || Filecache.new
 
-        Hiera.debug("Hiera MySQL initialized")
+        Hiera.debug("Hiera MySQL2 initialized")
       end
 
       def lookup(key, scope, order_override, resolution_type)
@@ -23,7 +23,7 @@ class Hiera
 
         Backend.datasources(scope, order_override) do |source|
           Hiera.debug("Looking for data source #{source}")
-          sqlfile = Backend.datafile(:mysql, scope, source, "sql") || next
+          sqlfile = Backend.datafile(:mysql2, scope, source, "sql") || next
 
           next unless File.exist?(sqlfile)
           data = @cache.read(sqlfile, Hash, {}) do |datafile|
@@ -46,10 +46,10 @@ class Hiera
         Hiera.debug("Executing SQL Query: #{query}")
 
         data=[]
-        mysql_host = Config[:mysql][:host]
-        mysql_user = Config[:mysql][:user]
-        mysql_pass = Config[:mysql][:pass]
-        mysql_database = Config[:mysql][:database]
+        mysql_host = Config[:mysql2][:host]
+        mysql_user = Config[:mysql2][:user]
+        mysql_pass = Config[:mysql2][:pass]
+        mysql_database = Config[:mysql2][:database]
         client = Mysql2::Client.new(:host => mysql_host, 
                                     :username => mysql_user, 
                                     :password => mysql_pass, 
