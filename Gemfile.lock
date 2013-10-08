@@ -2,11 +2,15 @@ PATH
   remote: .
   specs:
     hiera-mysql-backend (0.0.1)
+      hiera
       mysql2
 
 GEM
   remote: https://rubygems.org/
   specs:
+    hiera (1.2.1)
+      json_pure
+    json_pure (1.8.0)
     mysql2 (0.3.13)
     rake (10.1.0)
 
