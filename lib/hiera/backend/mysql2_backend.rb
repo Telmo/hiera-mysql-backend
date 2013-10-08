@@ -17,8 +17,9 @@ class Hiera
 
       def lookup(key, scope, order_override, resolution_type)
         # default answer just to make it easier on ourselves
+	results = nil
 
-        Hiera.debug("looking up %{key} in MySQL Backend")
+        Hiera.debug("looking up #{key} in MySQL2 Backend")
         Hiera.debug("resolution type is #{resolution_type}")
 
         Backend.datasources(scope, order_override) do |source|
@@ -30,6 +31,7 @@ class Hiera
             YAML.load(datafile)
           end
 
+          Hiera.debug("data #{data.inspect}")
           next if data.empty?
           next unless data.include?(key)
 
@@ -37,15 +39,16 @@ class Hiera
 
           new_answer = Backend.parse_answer(data[key], scope)
           results = query(new_answer)
-          return results
+
         end
+          return results
       end
 
 
       def query(query)
         Hiera.debug("Executing SQL Query: #{query}")
 
-        data=[]
+        data=nil
         mysql_host = Config[:mysql2][:host]
         mysql_user = Config[:mysql2][:user]
         mysql_pass = Config[:mysql2][:pass]
