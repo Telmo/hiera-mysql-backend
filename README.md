@@ -57,11 +57,10 @@ Hiera configuration is pretty simple
 :logger: console
 ```
 
-## Known issue
+## Known issues
 
-1. Naming conflict with hiera-mysql
-2. It always return an Array of hashes regardless of the number of items returned. (I did this on purpose because it is what I needed but I may be persuaded to do otherwise)
-3. This README is poorly written.
+1. It always return an Array of hashes regardless of the number of items returned. (I did this on purpose because it is what I needed but I may be persuaded to do otherwise)
+2. This README is poorly written.
 
 
 ## Contributing
