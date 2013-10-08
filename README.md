@@ -12,7 +12,7 @@ In [hiera-mysql](https://github.com/crayfishx/hiera-mysql) you define the querie
 
 [hiera-mysql](https://github.com/crayfishx/hiera-mysql) used the mysql gem, I am partial to [mysql2](https://github.com/brianmario/mysql2)
 
-Exception handling. hiera-mysql would cause a puppet run to fail if one of the queries was incorrect. For example a fact that you are distributing with a module is needed for the query to return its data but that fact is not available outside the module having a `SELECT from * %{custom_fact}` would make puppet runs fail.
+Exception handling. hiera-mysql would cause a puppet run to fail if one of the queries was incorrect. For example a fact that you are distributing with a module is needed for the query to return its data but that fact is not available outside the module having a `SELECT * from %{custom_fact}` would make puppet runs fail.
 
 ### What goes into the sql files.
 
