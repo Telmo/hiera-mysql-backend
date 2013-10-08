@@ -16,8 +16,11 @@ class Hiera
       end
 
       def lookup(key, scope, order_override, resolution_type)
-        # default answer just to make it easier on ourselves
-	results = nil
+        # default answer is set to nil otherwise the lookup ends up returning
+        # an Array of nils and causing a Puppet::Parser::AST::Resource failed with error ArgumentError
+        # for any other lookup because their default value is overwriten by [nil,nil,nil,nil]
+        # so hiera('myvalue', 'test1') returns [nil,nil,nil,nil]
+      	results = nil
 
         Hiera.debug("looking up #{key} in MySQL2 Backend")
         Hiera.debug("resolution type is #{resolution_type}")

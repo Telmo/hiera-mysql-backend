@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hiera-mysql-backend (0.0.1)
+    hiera-mysql-backend (0.0.2)
       hiera
       mysql2
 
