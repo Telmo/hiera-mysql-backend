@@ -17,7 +17,6 @@ class Hiera
 
       def lookup(key, scope, order_override, resolution_type)
         # default answer just to make it easier on ourselves
-        answer = nil
 
         Hiera.debug("looking up %{key} in MySQL Backend")
         Hiera.debug("resolution type is #{resolution_type}")
@@ -27,8 +26,8 @@ class Hiera
           sqlfile = Backend.datafile(:mysql, scope, source, "sql") || next
 
           next unless File.exist?(sqlfile)
-          data = @cache.read(sqlfile, Hash, {}) do |data|
-            YAML.load(data)
+          data = @cache.read(sqlfile, Hash, {}) do |datafile|
+            YAML.load(datafile)
           end
 
           next if data.empty?
@@ -40,32 +39,32 @@ class Hiera
           results = query(new_answer)
           return results
         end
+      end
 
 
-        def query(query)
-          Hiera.debug("Executing SQL Query: #{sql}")
+      def query(query)
+        Hiera.debug("Executing SQL Query: #{query}")
 
-          data=[]
-          mysql_host = Config[:mysql][:host]
-          mysql_user = Config[:mysql][:user]
-          mysql_pass = Config[:mysql][:pass]
-          mysql_database = Config[:mysql][:database]
-          client = Mysql2::Client.new(:host => mysql_host, 
-                                      :username => mysql_username, 
-                                      :password => mysql_pass, 
-                                      :database => mysql_database,
-                                      :reconnect => true)
-          begin
-            data = client.query(sql)
-            Hiera.debug("Mysql Query returned #{res.size} rows")
-          rescue => e
-            Hiera.debug e.message
-            data = nil
-          end
-
-          return data
-
+        data=[]
+        mysql_host = Config[:mysql][:host]
+        mysql_user = Config[:mysql][:user]
+        mysql_pass = Config[:mysql][:pass]
+        mysql_database = Config[:mysql][:database]
+        client = Mysql2::Client.new(:host => mysql_host, 
+                                    :username => mysql_user, 
+                                    :password => mysql_pass, 
+                                    :database => mysql_database,
+                                    :reconnect => true)
+        begin
+          data = client.query(query).to_a
+          Hiera.debug("Mysql Query returned #{data.size} rows")
+        rescue => e
+          Hiera.debug e.message
+          data = nil
         end
+
+        return data
+
       end
     end
   end
