@@ -67,6 +67,8 @@ class Hiera
         rescue => e
           Hiera.debug e.message
           data = nil
+        ensure
+          client.close
         end
 
         return data
