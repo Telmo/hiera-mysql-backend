@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "hiera-postgres-backend"
-  gem.version       = "0.0.1"
+  gem.version       = "0.0.2"
   gem.authors       = ["Adrian"]
   gem.email         = ["adrianlzt@gmail.com"]
   gem.description   = %q{Alternative PostgreSQL backend for hiera}
@@ -14,6 +14,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_dependency('pg')
-  gem.add_dependency('hiera')
+#  gem.add_dependency('hiera')
   gem.add_development_dependency('rake')
 end
