@@ -22,7 +22,7 @@ running `hiera applications` would run the query against the configured database
 
 ### Using
 
-`gem install hiera-postgresql-backend`
+`gem install hiera-postgres-backend`
 
 
 ### Configuring Hiera
