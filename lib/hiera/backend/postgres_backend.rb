@@ -1,18 +1,18 @@
 class Hiera
   module Backend
-    class Mysql2_backend
+    class Postgres_backend
 
       def initialize(cache=nil)
         begin
-          require 'mysql2'
+          require 'pg'
         rescue LoadError
           require 'rubygems'
-          require 'mysql2'
+          require 'pg'
         end
 
         @cache = cache || Filecache.new
 
-        Hiera.debug("Hiera MySQL2 initialized")
+        Hiera.debug("Hiera PostgreSQL initialized")
       end
 
       def lookup(key, scope, order_override, resolution_type)
@@ -20,14 +20,14 @@ class Hiera
         # an Array of nils and causing a Puppet::Parser::AST::Resource failed with error ArgumentError
         # for any other lookup because their default value is overwriten by [nil,nil,nil,nil]
         # so hiera('myvalue', 'test1') returns [nil,nil,nil,nil]
-      	results = nil
+      	answer = nil
 
-        Hiera.debug("looking up #{key} in MySQL2 Backend")
+        Hiera.debug("looking up #{key} in PostgreSQL Backend")
         Hiera.debug("resolution type is #{resolution_type}")
 
         Backend.datasources(scope, order_override) do |source|
           Hiera.debug("Looking for data source #{source}")
-          sqlfile = Backend.datafile(:mysql2, scope, source, "sql") || next
+          sqlfile = Backend.datafile(:postgres, scope, source, "sql") || next
 
           next unless File.exist?(sqlfile)
           data = @cache.read(sqlfile, Hash, {}) do |datafile|
@@ -41,10 +41,22 @@ class Hiera
           Hiera.debug("Found #{key} in #{source}")
 
           new_answer = Backend.parse_answer(data[key], scope)
-          results = query(new_answer)
+          case resolution_type
+          when :array
+            raise Exception, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.kind_of? Array or new_answer.kind_of? String
+            answer ||= []
+            answer << query(new_answer)
+          when :hash
+            raise Exception, "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.kind_of? Hash
+            answer ||= {}
+            answer = Backend.merge_answer(query(new_answer),answer)
+          else
+            answer = query(new_answer)
+            break
+          end
 
         end
-          return results
+          return answer
       end
 
 
@@ -52,18 +64,17 @@ class Hiera
         Hiera.debug("Executing SQL Query: #{query}")
 
         data=nil
-        mysql_host = Config[:mysql2][:host]
-        mysql_user = Config[:mysql2][:user]
-        mysql_pass = Config[:mysql2][:pass]
-        mysql_database = Config[:mysql2][:database]
-        client = Mysql2::Client.new(:host => mysql_host, 
-                                    :username => mysql_user, 
-                                    :password => mysql_pass, 
-                                    :database => mysql_database,
-                                    :reconnect => true)
+        pg_host = Config[:postgres][:host]
+        pg_user = Config[:postgres][:user]
+        pg_pass = Config[:postgres][:pass]
+        pg_database = Config[:postgres][:database]
+        client = PG::Connection.new(:host     => pg_host, 
+                                    :user     => pg_user, 
+                                    :password => pg_pass, 
+                                    :dbname   => pg_database)
         begin
-          data = client.query(query).to_a
-          Hiera.debug("Mysql Query returned #{data.size} rows")
+          data = client.exec(query).to_a
+          Hiera.debug("PostgreSQL Query returned #{data.size} rows")
         rescue => e
           Hiera.debug e.message
           data = nil

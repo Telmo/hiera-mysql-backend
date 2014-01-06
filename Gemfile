@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in hiera-mysql-backend.gemspec
+# Specify your gem's dependencies in hiera-postgres-backend.gemspec
 gemspec
