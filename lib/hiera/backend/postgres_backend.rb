@@ -20,7 +20,7 @@ class Hiera
         # an Array of nils and causing a Puppet::Parser::AST::Resource failed with error ArgumentError
         # for any other lookup because their default value is overwriten by [nil,nil,nil,nil]
         # so hiera('myvalue', 'test1') returns [nil,nil,nil,nil]
-      	results = nil
+      	answer = nil
 
         Hiera.debug("looking up #{key} in PostgreSQL Backend")
         Hiera.debug("resolution type is #{resolution_type}")
@@ -41,10 +41,22 @@ class Hiera
           Hiera.debug("Found #{key} in #{source}")
 
           new_answer = Backend.parse_answer(data[key], scope)
-          results = query(new_answer)
+          case resolution_type
+          when :array
+            raise Exception, "Hiera type mismatch: expected Array and got #{new_answer.class}" unless new_answer.kind_of? Array or new_answer.kind_of? String
+            answer ||= []
+            answer << query(new_answer)
+          when :hash
+            raise Exception, "Hiera type mismatch: expected Hash and got #{new_answer.class}" unless new_answer.kind_of? Hash
+            answer ||= {}
+            answer = Backend.merge_answer(query(new_answer),answer)
+          else
+            answer = query(new_answer)
+            break
+          end
 
         end
-          return results
+          return answer
       end
 
 
