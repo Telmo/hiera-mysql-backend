@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/hiera-mysql-backend.png)](http://badge.fury.io/rb/hiera-mysql-backend)
+
 ## hiera-mysql-backend
 
 Alternate MySQL backend for Hiera
