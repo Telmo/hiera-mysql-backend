@@ -34,6 +34,19 @@ class Hiera
             YAML.load(datafile)
           end
 
+          mysql_host = data[:dbconfig][:host] || Config[:mysql2][:host]
+          mysql_user = data[:dbconfig][:user] || Config[:mysql2][:user]
+          mysql_pass = data[:dbconfig][:pass] || Config[:mysql2][:pass]
+          mysql_database = data[:dbconfig][:database] || Config[:mysql2][:database]
+
+          connection_hash = {
+            :host => mysql_host, 
+            :username => mysql_user, 
+            :password => mysql_pass, 
+            :database => mysql_database,
+            :reconnect => true}
+
+
           Hiera.debug("data #{data.inspect}")
           next if data.empty?
           next unless data.include?(key)
@@ -41,26 +54,18 @@ class Hiera
           Hiera.debug("Found #{key} in #{source}")
 
           new_answer = Backend.parse_answer(data[key], scope)
-          results = query(new_answer)
+          results = query(connection_hash, new_answer)
 
         end
-          return results
+        return results
       end
 
 
-      def query(query)
+      def query(connection_hash, query)
         Hiera.debug("Executing SQL Query: #{query}")
 
         data=nil
-        mysql_host = Config[:mysql2][:host]
-        mysql_user = Config[:mysql2][:user]
-        mysql_pass = Config[:mysql2][:pass]
-        mysql_database = Config[:mysql2][:database]
-        client = Mysql2::Client.new(:host => mysql_host, 
-                                    :username => mysql_user, 
-                                    :password => mysql_pass, 
-                                    :database => mysql_database,
-                                    :reconnect => true)
+        client = Mysql2::Client.new(connection_hash)
         begin
           data = client.query(query).to_a
           Hiera.debug("Mysql Query returned #{data.size} rows")
