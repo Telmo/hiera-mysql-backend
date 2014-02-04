@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Alternative MySQL backend for hiera}
   gem.summary       = %q{Alternative MySQL backend for hiera}
   gem.homepage      = "https://github.com/Telmo/hiera-mysql-backend"
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
