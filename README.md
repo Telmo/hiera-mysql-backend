@@ -18,10 +18,19 @@ Exception handling. hiera-mysql would cause a puppet run to fail if one of the q
 
 The poorly named sql files are really yaml files where the key is the lookup key and the value is the SQL statement (it accepts interpolation)
 
+As of version 0.0.4 you can also add connection information to these sql files, this allows you to connect to different databases. This is optional if no connection information is found it will use the default defined in your hiera.yaml config.
+
 Lets assume your _datadir_ is `/etc/puppet/hieradata/` and your hierarchy for hiera just have a common. hiera-mysql-backend would look for /etc/puppet/hieradata/common.sql the common.sql would look like:
 
 ```yaml
 ---
+# This is optional, if not present it will use the default connection info from hiera.yaml
+:dbconfig:
+  :host: database.example.com
+  :user: hieratest
+  :pass: sekret
+  :database: testhieradb
+
 applications: SELECT * FROM applications WHERE host='%{fqdn}';
 coats: SELECT cut,name,type FROM coats WHERE color='brown';
 ```
