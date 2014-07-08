@@ -37,6 +37,7 @@ class Hiera
           mysql_host = data.fetch(:dbconfig, {}).fetch(:host, nil) || Config[:mysql2][:host]
           mysql_user = data.fetch(:dbconfig, {}).fetch(:user, nil) || Config[:mysql2][:user]
           mysql_pass = data.fetch(:dbconfig, {}).fetch(:pass, nil) || Config[:mysql2][:pass]
+          mysql_port = data.fetch(:dbconfig, {}).fetch(:pass, nil) || Config[:mysql2][:port]
           mysql_database = data.fetch(:dbconfig, {}).fetch(:database, nil) || Config[:mysql2][:database]
 
           connection_hash = {
@@ -44,6 +45,7 @@ class Hiera
             :username => mysql_user, 
             :password => mysql_pass, 
             :database => mysql_database,
+            :port => mysql_port,
             :reconnect => true}
 
 
