@@ -32,10 +32,15 @@ Lets assume your _datadir_ is `/etc/puppet/hieradata/` and your hierarchy for hi
   :user: hieratest
   :pass: sekret
   :database: testhieradb
+  :port: 44445
 
 applications: SELECT * FROM applications WHERE host='%{fqdn}';
 coats: SELECT cut,name,type FROM coats WHERE color='brown';
 ```
+
+If `host` is not defined it will use `localhost` as default.
+
+If `port` is not defined it will use the default `3306` mysql port
 
 running `hiera applications` would run the query against the configured database.
 
@@ -64,6 +69,7 @@ Hiera configuration is pretty simple
   :user: username
   :pass: password
   :database: database
+  :port: 3306
 
 :hierarchy:
   - "%{::clientcert}"
@@ -72,6 +78,10 @@ Hiera configuration is pretty simple
 
 :logger: console
 ```
+
+If `host` is not defined it will use `localhost` as default.
+
+If `port` is not defined it will use the default `3306` mysql port
 
 ## Known issues
 

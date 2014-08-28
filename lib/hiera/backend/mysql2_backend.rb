@@ -34,11 +34,12 @@ class Hiera
             YAML.load(datafile)
           end
 
-          mysql_host = data.fetch(:dbconfig, {}).fetch(:host, nil) || Config[:mysql2][:host]
-          mysql_user = data.fetch(:dbconfig, {}).fetch(:user, nil) || Config[:mysql2][:user]
-          mysql_pass = data.fetch(:dbconfig, {}).fetch(:pass, nil) || Config[:mysql2][:pass]
-          mysql_port = data.fetch(:dbconfig, {}).fetch(:port, nil) || Config[:mysql2][:port]
-          mysql_database = data.fetch(:dbconfig, {}).fetch(:database, nil) || Config[:mysql2][:database]
+          mysql_config = data.fetch(:dbconfig, {})
+          mysql_host = mysql_config.fetch(:host, nil) || Config[:mysql2][:host] || 'localhost'
+          mysql_user = mysql_config.fetch(:user, nil) || Config[:mysql2][:user]
+          mysql_pass = mysql_config.fetch(:pass, nil) || Config[:mysql2][:pass]
+          mysql_port = mysql_config.fetch(:port, nil) || Config[:mysql2][:port] || '3306'
+          mysql_database = mysql_config.fetch(:database, nil) || Config[:mysql2][:database]
 
           connection_hash = {
             :host => mysql_host,
