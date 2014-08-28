@@ -20,7 +20,7 @@ class Hiera
         # an Array of nils and causing a Puppet::Parser::AST::Resource failed with error ArgumentError
         # for any other lookup because their default value is overwriten by [nil,nil,nil,nil]
         # so hiera('myvalue', 'test1') returns [nil,nil,nil,nil]
-      	results = nil
+        results = nil
 
         Hiera.debug("looking up #{key} in MySQL2 Backend")
         Hiera.debug("resolution type is #{resolution_type}")
@@ -41,22 +41,22 @@ class Hiera
           mysql_database = data.fetch(:dbconfig, {}).fetch(:database, nil) || Config[:mysql2][:database]
 
           connection_hash = {
-            :host => mysql_host, 
-            :username => mysql_user, 
-            :password => mysql_pass, 
+            :host => mysql_host,
+            :username => mysql_user,
+            :password => mysql_pass,
             :database => mysql_database,
             :port => mysql_port,
             :reconnect => true}
 
 
-          Hiera.debug("data #{data.inspect}")
-          next if data.empty?
-          next unless data.include?(key)
+            Hiera.debug("data #{data.inspect}")
+            next if data.empty?
+            next unless data.include?(key)
 
-          Hiera.debug("Found #{key} in #{source}")
+            Hiera.debug("Found #{key} in #{source}")
 
-          new_answer = Backend.parse_answer(data[key], scope)
-          results = query(connection_hash, new_answer)
+            new_answer = Backend.parse_answer(data[key], scope)
+            results = query(connection_hash, new_answer)
 
         end
         return results
