@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "hiera-mysql-backend"
-  gem.version       = "0.0.4"
+  gem.version       = "0.0.5"
   gem.authors       = ["Telmo"]
   gem.email         = ["telmox@gmail.com"]
   gem.description   = %q{Alternative MySQL backend for hiera}
