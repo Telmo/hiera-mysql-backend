@@ -3,11 +3,16 @@ class Hiera
     class Mysql2_backend
 
       def initialize(cache=nil)
-        begin
-          require 'mysql2'
-        rescue LoadError
-          require 'rubygems'
-          require 'mysql2'
+        if defined?(JRUBY_VERSION)
+          require 'jdbc/mysql'
+          require 'java'
+        else
+          begin
+            require 'mysql2'
+          rescue LoadError
+            require 'rubygems'
+            require 'mysql2'
+          end
         end
 
         @cache = cache || Filecache.new
@@ -50,14 +55,14 @@ class Hiera
             :reconnect => true}
 
 
-            Hiera.debug("data #{data.inspect}")
-            next if data.empty?
-            next unless data.include?(key)
+          Hiera.debug("data #{data.inspect}")
+          next if data.empty?
+          next unless data.include?(key)
 
-            Hiera.debug("Found #{key} in #{source}")
+          Hiera.debug("Found #{key} in #{source}")
 
-            new_answer = Backend.parse_answer(data[key], scope)
-            results = query(connection_hash, new_answer)
+          new_answer = Backend.parse_answer(data[key], scope)
+          results = query(connection_hash, new_answer)
 
         end
         return results
@@ -67,16 +72,53 @@ class Hiera
       def query(connection_hash, query)
         Hiera.debug("Executing SQL Query: #{query}")
 
-        data=nil
-        client = Mysql2::Client.new(connection_hash)
-        begin
-          data = client.query(query).to_a
-          Hiera.debug("Mysql Query returned #{data.size} rows")
-        rescue => e
-          Hiera.debug e.message
-          data = nil
-        ensure
-          client.close
+        data=[]
+        mysql_host=connection_hash[:host]
+        mysql_user=connection_hash[:username]
+        mysql_pass=connection_hash[:password]
+        mysql_database=connection_hash[:database]
+        mysql_port=connection_hash[:port]
+
+        if defined?(JRUBY_VERSION)
+          Jdbc::MySQL.load_driver
+          url = "jdbc:mysql://#{mysql_host}:#{mysql_port}/#{mysql_database}"
+          props = java.util.Properties.new
+          props.set_property :user, mysql_user
+          props.set_property :password, mysql_pass
+
+          conn = com.mysql.jdbc.Driver.new.connect(url,props)
+          stmt = conn.create_statement
+
+          res = stmt.execute_query(query)
+          md = res.getMetaData
+          numcols = md.getColumnCount
+
+          Hiera.debug("Mysql Query returned #{numcols} rows")
+
+          while ( res.next ) do
+            if numcols < 2
+              Hiera.debug("Mysql value : #{res.getString(1)}")
+              data << res.getString(1)
+            else
+              row = {}
+              (1..numcols).each do |c|
+                row[md.getColumnName(c)] = res.getString(c)
+              end
+              data << row
+            end
+          end
+
+        else
+          client = Mysql2::Client.new(connection_hash)
+          begin
+            data = client.query(query).to_a
+            Hiera.debug("Mysql Query returned #{data.size} rows")
+          rescue => e
+            Hiera.debug e.message
+            data = nil
+          ensure
+            client.close
+          end
         end
 
         return data
