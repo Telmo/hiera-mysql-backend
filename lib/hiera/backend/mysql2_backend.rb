@@ -46,18 +46,18 @@ class Hiera
           mysql_port = mysql_config.fetch(:port, nil) || Config[:mysql2][:port] || '3306'
           mysql_database = mysql_config.fetch(:database, nil) || Config[:mysql2][:database]
 
-          connection_hash = {
-            :host => mysql_host,
-            :username => mysql_user,
-            :password => mysql_pass,
-            :database => mysql_database,
-            :port => mysql_port,
-            :reconnect => true}
-
-
           Hiera.debug("data #{data.inspect}")
           next if data.empty?
           next unless data.include?(key)
+
+          connection_hash = {
+            :host => Backend.parse_answer(mysql_host, scope),
+            :username => Backend.parse_answer(mysql_user, scope),
+            :password => Backend.parse_answer(mysql_pass, scope),
+            :port => Backend.parse_answer(mysql_port, scope),
+            :database => Backend.parse_answer(mysql_database, scope),
+            :reconnect => true
+          }
 
           Hiera.debug("Found #{key} in #{source}")
 
